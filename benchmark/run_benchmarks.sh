@@ -15,11 +15,11 @@ else
   RESULT_DIR="$(realpath results)"
 fi
 
-# Pick exactly one .gguf per model: either
+# Pick exactly one .gguf file or link, per model: either
 #  - any .gguf without "-000*-of-" (single-file models)
 #  - or the first shard "*-00001-of-*.gguf"
 mapfile -t MODEL_PATHS < <(
-  find "$MODEL_DIR" -type f -name '*.gguf' \
+  find "$MODEL_DIR" \( -type f -o -type l \) -name '*.gguf' \
     \( -name '*-00001-of-*.gguf' -o -not -name '*-000*-of-*.gguf' \) \
     | sort
 )
@@ -55,21 +55,22 @@ if is_ubuntu; then
   --device /dev/kfd \
   --security-opt seccomp=unconfined \
   --ipc=host \
+  --pid=host \
   -v ${MODEL_DIR}:${MODEL_DIR} \
   -v ${RESULT_DIR}:${RESULT_DIR}"
 
   declare -A CMDS=(
-    #[rocm6_4_4]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4 /usr/local/bin/llama-bench"
-    #[rocm6_4_4-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4-rocwmma /usr/local/bin/llama-bench"
+    ##[rocm6_4_4]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4 /usr/local/bin/llama-bench"
+    ##[rocm6_4_4-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4-rocwmma /usr/local/bin/llama-bench"
     [rocm7.1.1]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1 /usr/local/bin/llama-bench"
     [rocm7.1.1-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1-rocwmma /usr/local/bin/llama-bench"
-    #[rocm-7alpha-rocwmma-improved]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma-improved /usr/local/bin/llama-bench"
+    ##[rocm-7alpha-rocwmma-improved]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma-improved /usr/local/bin/llama-bench"
     [rocm-7alpha]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha /usr/local/bin/llama-bench"
-    #[rocm-7alpha-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma /usr/local/bin/llama-bench"
+    ##[rocm-7alpha-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma /usr/local/bin/llama-bench"
     [rocm7_rc]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7rc /usr/local/bin/llama-bench"
-    #[rocm7_rc-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7rc-rocwmma /usr/local/bin/llama-bench"
+    ##[rocm7_rc-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7rc-rocwmma /usr/local/bin/llama-bench"
     # discontinued path
-    #[vulkan_amdvlk]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:vulkan-amdvlk /usr/sbin/llama-bench"
+    ##[vulkan_amdvlk]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:vulkan-amdvlk /usr/sbin/llama-bench"
     [vulkan_radv]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:vulkan-radv /usr/sbin/llama-bench"
   )
 else

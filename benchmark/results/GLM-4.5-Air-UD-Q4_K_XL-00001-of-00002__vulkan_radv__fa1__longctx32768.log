@@ -1,0 +1,6 @@
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = Radeon 8060S Graphics (RADV GFX1151) (radv) | uma: 1 | fp16: 1 | bf16: 0 | warp size: 64 | shared memory: 65536 | int dot: 1 | matrix cores: KHR_coopmat
+main: error: failed to load model '/media/sid/Data/projects/ai/models2bench/hub/models--unsloth--GLM-4.5-Air-GGUF/snapshots/506d64aa8c5cfe9dbbf00bc7a15739438f83204d/UD-Q4_K_XL/GLM-4.5-Air-UD-Q4_K_XL-00001-of-00002.gguf'
+| model                          |       size |     params | backend    | ngl | fa | mmap |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | -: | ---: | --------------: | -------------------: |
+✖ ! [vulkan_radv] GLM-4.5-Air-UD-Q4_K_XL-00001-of-00002__fa1 __longctx32768 failed (exit 0)
