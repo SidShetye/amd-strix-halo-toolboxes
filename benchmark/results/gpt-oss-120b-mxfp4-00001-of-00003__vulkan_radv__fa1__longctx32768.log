@@ -1,6 +1,6 @@
 ggml_vulkan: Found 1 Vulkan devices:
 ggml_vulkan: 0 = Radeon 8060S Graphics (RADV GFX1151) (radv) | uma: 1 | fp16: 1 | bf16: 0 | warp size: 64 | shared memory: 65536 | int dot: 1 | matrix cores: KHR_coopmat
-main: error: failed to load model '/media/sid/Data/projects/ai/models2bench/hub/models--unsloth--gemma-3-4b-it-GGUF/snapshots/5a3566e716d80f709ed7b79817eaf7733d2a1fce/gemma-3-4b-it-Q3_K_S.gguf'
+main: error: failed to load model '/media/sid/Data/projects/ai/models2bench/hub/models--ggml-org--gpt-oss-120b-GGUF/snapshots/d932fcea62f83e088d8f076a2cd2d7eb02dfa682/gpt-oss-120b-mxfp4-00001-of-00003.gguf'
 | model                          |       size |     params | backend    | ngl | fa | mmap |            test |                  t/s |
 | ------------------------------ | ---------: | ---------: | ---------- | --: | -: | ---: | --------------: | -------------------: |
-✖ ! [vulkan_radv] gemma-3-4b-it-Q3_K_S__fa1 failed (exit 0)
+✖ ! [vulkan_radv] gpt-oss-120b-mxfp4-00001-of-00003__fa1 __longctx32768 failed (exit 0)

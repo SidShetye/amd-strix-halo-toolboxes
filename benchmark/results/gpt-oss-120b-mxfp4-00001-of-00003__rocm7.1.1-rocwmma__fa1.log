@@ -1,10 +1,47 @@
-ggml_cuda_init: GGML_CUDA_FORCE_MMQ:    no
-ggml_cuda_init: GGML_CUDA_FORCE_CUBLAS: no
+Unable to find image 'kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1-rocwmma' locally
+rocm-7.1.1-rocwmma: Pulling from kyuz0/amd-strix-halo-toolboxes
+4d75940bf853: Already exists
+aed158ec9a32: Pulling fs layer
+0423f51f72a4: Pulling fs layer
+01c31492bfc8: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+6f4d18999ac2: Pulling fs layer
+0672ed696886: Pulling fs layer
+da66297f7387: Pulling fs layer
+af24ec7aeb87: Pulling fs layer
+6f4d18999ac2: Waiting
+0672ed696886: Waiting
+af24ec7aeb87: Waiting
+da66297f7387: Waiting
+4f4fb700ef54: Waiting
+aed158ec9a32: Download complete
+aed158ec9a32: Pull complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+6f4d18999ac2: Verifying Checksum
+6f4d18999ac2: Download complete
+0672ed696886: Verifying Checksum
+0672ed696886: Download complete
+01c31492bfc8: Verifying Checksum
+01c31492bfc8: Download complete
+da66297f7387: Download complete
+af24ec7aeb87: Download complete
+0423f51f72a4: Verifying Checksum
+0423f51f72a4: Download complete
+0423f51f72a4: Pull complete
+01c31492bfc8: Pull complete
+4f4fb700ef54: Pull complete
+6f4d18999ac2: Pull complete
+0672ed696886: Pull complete
+da66297f7387: Pull complete
+af24ec7aeb87: Pull complete
+Digest: sha256:c839b33a9046f9db9baa6e751c21ebf9ba09c8627ee1f804e8474a4ac8fdf959
+Status: Downloaded newer image for kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1-rocwmma
 ggml_cuda_init: found 1 ROCm devices:
   Device 0: Radeon 8060S Graphics, gfx1151 (0x1151), VMM: no, Wave Size: 32
 | model                          |       size |     params | backend    | ngl | fa | mmap |            test |                  t/s |
 | ------------------------------ | ---------: | ---------: | ---------- | --: | -: | ---: | --------------: | -------------------: |
-| gpt-oss 120B MXFP4 MoE         |  59.02 GiB |   116.83 B | ROCm       |  99 |  1 |    0 |           pp512 |       637.48 ± 24.73 |
-| gpt-oss 120B MXFP4 MoE         |  59.02 GiB |   116.83 B | ROCm       |  99 |  1 |    0 |           tg128 |         51.66 ± 0.01 |
+| gpt-oss 120B MXFP4 MoE         |  59.02 GiB |   116.83 B | ROCm       |  99 |  1 |    0 |           pp512 |       680.49 ± 11.64 |
+| gpt-oss 120B MXFP4 MoE         |  59.02 GiB |   116.83 B | ROCm       |  99 |  1 |    0 |           tg128 |         51.62 ± 0.01 |
 
-build: 2aa45ef9e (7423)
+build: 92ac1e016 (7629)

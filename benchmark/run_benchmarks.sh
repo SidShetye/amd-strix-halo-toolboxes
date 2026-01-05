@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-MODEL_DIR="$(realpath models)"
-RESULTDIR="results"
-mkdir -p "$RESULTDIR"
+# optionally let user supply models directory as first argument
+if [[ ${#} -ge 1 && -n "$1" ]]; then
+  MODEL_DIR="$(realpath "$1")"
+else
+  MODEL_DIR="$(realpath models)"
+fi
+# Use an absolute path for the results directory
+if [[ -e results ]]; then
+  RESULT_DIR="$(realpath results)"
+else
+  mkdir -p results
+  RESULT_DIR="$(realpath results)"
+fi
 
 # Pick exactly one .gguf per model: either
 #  - any .gguf without "-000*-of-" (single-file models)
@@ -25,19 +35,59 @@ for p in "${MODEL_PATHS[@]}"; do
 done
 echo
 
-declare -A CMDS=(
-  [rocm6_4_4]="toolbox run -c llama-rocm-6.4.4 -- /usr/local/bin/llama-bench"
-  [rocm6_4_4-rocwmma]="toolbox run -c llama-rocm-6.4.4-rocwmma -- /usr/local/bin/llama-bench"
-  [rocm7.1.1]="toolbox run -c llama-rocm-7.1.1 -- /usr/local/bin/llama-bench"
-  [rocm7.1.1-rocwmma]="toolbox run -c llama-rocm-7.1.1-rocwmma -- /usr/local/bin/llama-bench"
-  [rocm-7alpha-rocwmma-improved]="toolbox run -c llama-rocm-7alpha-rocwmma-improved -- /usr/local/bin/llama-bench"
-  [rocm-7alpha]="toolbox run -c llama-rocm-7alpha -- /usr/local/bin/llama-bench"
-  [rocm-7alpha-rocwmma]="toolbox run -c llama-rocm-7alpha-rocwmma -- /usr/local/bin/llama-bench"  
-  [rocm7_rc]="toolbox run -c llama-rocm-7rc -- /usr/local/bin/llama-bench"
-  [rocm7_rc-rocwmma]="toolbox run -c llama-rocm-7rc-rocwmma -- /usr/local/bin/llama-bench"
-  [vulkan_amdvlk]="toolbox run -c llama-vulkan-amdvlk -- /usr/sbin/llama-bench"
-  [vulkan_radv]="toolbox run -c llama-vulkan-radv -- /usr/sbin/llama-bench"
-)
+is_ubuntu() {
+  if [[ -r /etc/os-release ]]; then
+    . /etc/os-release
+    if [[ "${ID:-}" == "ubuntu" ]]; then
+      return 0
+    fi
+    if [[ -n "${ID_LIKE:-}" && "${ID_LIKE,,}" == *ubuntu* ]]; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+if is_ubuntu; then
+
+  # In Ubuntu GPU access needs root, docker runs as root, pass args
+  EXTRA_CONTAINER_ARGS="--device /dev/dri \
+  --device /dev/kfd \
+  --security-opt seccomp=unconfined \
+  --ipc=host \
+  -v ${MODEL_DIR}:${MODEL_DIR} \
+  -v ${RESULT_DIR}:${RESULT_DIR}"
+
+  declare -A CMDS=(
+    #[rocm6_4_4]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4 /usr/local/bin/llama-bench"
+    #[rocm6_4_4-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4-rocwmma /usr/local/bin/llama-bench"
+    [rocm7.1.1]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1 /usr/local/bin/llama-bench"
+    [rocm7.1.1-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7.1.1-rocwmma /usr/local/bin/llama-bench"
+    #[rocm-7alpha-rocwmma-improved]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma-improved /usr/local/bin/llama-bench"
+    [rocm-7alpha]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha /usr/local/bin/llama-bench"
+    #[rocm-7alpha-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7alpha-rocwmma /usr/local/bin/llama-bench"
+    [rocm7_rc]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7rc /usr/local/bin/llama-bench"
+    #[rocm7_rc-rocwmma]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-7rc-rocwmma /usr/local/bin/llama-bench"
+    # discontinued path
+    #[vulkan_amdvlk]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:vulkan-amdvlk /usr/sbin/llama-bench"
+    [vulkan_radv]="docker run --rm ${EXTRA_CONTAINER_ARGS} docker.io/kyuz0/amd-strix-halo-toolboxes:vulkan-radv /usr/sbin/llama-bench"
+  )
+else
+  declare -A CMDS=(
+    [rocm6_4_4]="toolbox run -c llama-rocm-6.4.4 -- /usr/local/bin/llama-bench"
+    [rocm6_4_4-rocwmma]="toolbox run -c llama-rocm-6.4.4-rocwmma -- /usr/local/bin/llama-bench"
+    [rocm7.1.1]="toolbox run -c llama-rocm-7.1.1 -- /usr/local/bin/llama-bench"
+    [rocm7.1.1-rocwmma]="toolbox run -c llama-rocm-7.1.1-rocwmma -- /usr/local/bin/llama-bench"
+    [rocm-7alpha-rocwmma-improved]="toolbox run -c llama-rocm-7alpha-rocwmma-improved -- /usr/local/bin/llama-bench"
+    [rocm-7alpha]="toolbox run -c llama-rocm-7alpha -- /usr/local/bin/llama-bench"
+    [rocm-7alpha-rocwmma]="toolbox run -c llama-rocm-7alpha-rocwmma -- /usr/local/bin/llama-bench"
+    [rocm7_rc]="toolbox run -c llama-rocm-7rc -- /usr/local/bin/llama-bench"
+    [rocm7_rc-rocwmma]="toolbox run -c llama-rocm-7rc-rocwmma -- /usr/local/bin/llama-bench"
+    [vulkan_amdvlk]="toolbox run -c llama-vulkan-amdvlk -- /usr/sbin/llama-bench"
+    [vulkan_radv]="toolbox run -c llama-vulkan-radv -- /usr/sbin/llama-bench"
+  )
+fi
+
 
 get_hblt_modes() {
   local env="$1"
@@ -90,7 +140,7 @@ for MODEL_PATH in "${MODEL_PATHS[@]}"; do
             fi
           fi
 
-          OUT="$RESULTDIR/${MODEL_NAME}__${ENV}${SUFFIX}${CTX_SUFFIX}.log"
+          OUT="$RESULT_DIR/${MODEL_NAME}__${ENV}${SUFFIX}${CTX_SUFFIX}.log"
           CTX_REPS=3
           if [[ "$CTX" == longctx32768 ]]; then
             CTX_REPS=1
